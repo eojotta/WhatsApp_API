@@ -1,5 +1,5 @@
 /***************************************************************
-* Objetivo : Sinmular uma API do whatsapp
+* Objetivo : Simular uma API do whatsapp
 * Autor : João Pedro dos Santos
 * Data : 04/08/2026
 * Versão : 1.0
@@ -21,7 +21,7 @@ function listaTodosContatos(){
 
 function getPerfilPorNumero(numero) {
 
-    let listaTodosContatos = false 
+    let resultado = false 
 
     contatos["whats-users"].forEach(function(dados){
 
@@ -73,7 +73,103 @@ function getDadosContatos(numero) {
 
 /****************************************************************************************** */
 
+//Listar todas as mensagens trocadas de uma conta de usuário
 
-console.log(getDadosContatos("11987876567"));
+function getTodasMensagens(numero) {
+    let todasMensagens = [];
+
+    for (let usuario of contatos["whats-users"]) {
+        if (usuario.number == numero) {
+
+            for (let contato of usuario.contacts) {
+                todasMensagens.push(...contato.messages);
+            }
+
+        }
+    }
+
+    return todasMensagens;
+}
+
+/******************************************************************************************* */
+
+//Listar uma conversa de um usuário e um contato
+
+function getConversa(query) {
+    const numero = query.numero;
+    const nomeContato = query.contato;
+
+    for (let usuario of contatos["whats-users"]) {
+        if (usuario.number == numero) {
+
+            for (let contato of usuario.contacts) {
+                if (contato.name == nomeContato) {
+                    return {
+                        nome: usuario.account,
+                        numero: usuario.number,
+                        contato: contato.name,
+                        mensagens: contato.messages
+                    };
+                }
+            }
+
+        }
+    }
+
+    return null;
+}
+
+/******************************************************************************************** */
+
+//Pesquisa de Palavra chave
+
+function pesquisarPalavra(palavra) {
+    let resultado = [];
+
+    for (let usuario of contatos["whats-users"]) {
+        for (let contato of usuario.contacts) {
+            for (let mensagem of contato.messages) {
+
+                if (mensagem.content.includes(palavra)) {
+                    resultado.push({
+                        usuario: usuario.account,
+                        contato: contato.name,
+                        mensagem: mensagem.content,
+                        hora: mensagem.time
+                    });
+                }
+            }
+        }
+    }
+
+    return resultado;
+}
+
+// filtro por palavra chave
+//console.log(pesquisarPalavra("projeto"));
+
+//Listar todos os dados de usuário independente do número
 //console.log(listaTodosContatos())
+
+//Listar dados de contato para cada usuário
+//console.log(getDadosContatos("11987876567"));
+
+//Listar dados da conta do profile do usuário
 //console.log(getPerfilPorNumero(11987876567))
+
+//Listar todas as mensagens trocadas de uma conta de usuário
+//JSON.stringify -> o console.log normal mostra [Object], Com isso, ele mostra tudo detalhado.
+//console.log(getTodasMensagens("11987876567"));
+
+//Listar uma conversa de um usuário e um contato
+//console.log(getConversa({numero: "11987876567",contato: "Ana Maria"}));
+
+
+module.exports = {
+    listaTodosContatos,
+    getPerfilPorNumero,
+    getDadosContatos,
+    getTodasMensagens,
+    getConversa,
+    pesquisarPalavra
+};
